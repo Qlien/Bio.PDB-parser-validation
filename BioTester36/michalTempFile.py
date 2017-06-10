@@ -37,53 +37,59 @@ class WarningHackClass:
     listOfWarnings = []
 
 
-iterator = 0
+def parseAndSaveToDatabase(filesDirectory, file, _7zipLocation, cnx, listOfEntries, xml, xmlErrors): #cnx is database connection
+    try:
+        WarningHackClass.listOfWarnings = []
+        def customwarn(message, category, filename, lineno, file=None, line=None):
+            warningString = warnings.formatwarning(message, category, filename, lineno)
+            strintArray = re.sub(r'.*:\s', '', warningString).strip().split("\n")
+            if strintArray[len(strintArray) - 1][-1:] == ')':
+                strintArray[len(strintArray) - 1] = strintArray[len(strintArray) - 1][:-1].strip()
+            WarningHackClass.listOfWarnings.append(strintArray)
 
-def parseAndSaveToDatabase(filesDirectory, file, _7zipLocation, cnx, listOfEntries, xml): #cnx is database connection
-    WarningHackClass.listOfWarnings = []
-    def customwarn(message, category, filename, lineno, file=None, line=None):
-        warningString = warnings.formatwarning(message, category, filename, lineno)
-        strintArray = re.sub(r'.*:\s', '', warningString).strip().split("\n")
-        if strintArray[len(strintArray) - 1][-1:] == ')':
-            strintArray[len(strintArray) - 1] = strintArray[len(strintArray) - 1][:-1].strip()
-        WarningHackClass.listOfWarnings.append(strintArray)
+        warnings.showwarning = customwarn
 
-    warnings.showwarning = customwarn
+        path = "\""+ _7zipLocation+ '7z.exe' + "\" "+ 'e '+ "\""+ filesDirectory+ '/' + file + "\"" + ' -o'+ "\"" + pathToStore+ "\""
+        subprocess.call(path)
 
-    path = "\""+ _7zipLocation+ '7z.exe' + "\" "+ 'e '+ "\""+ filesDirectory+ '/' + file + "\"" + ' -o'+ "\"" + pathToStore+ "\""
-    subprocess.call(path)
+        filename = file[3:-7]
+        listOfEntries[filename] = {}
 
-    filename = file[3:-7]
-    listOfEntries[filename] = {}
+        structureHandler = XMLParser.SubElement(xml, "structure", name=str(file[3:-7]))
 
-    structureHandler = XMLParser.SubElement(xml, "structure", name=str(file[3:-7]))
+        print('filename', file[3:-7]) # filename
+        t1 = time.time()
+        parser = PDBParser()
+        try:
+            structure = parser.get_structure('PHA-L', 'C:/data/1/' + file[:-2])
+            fileSize = convert_size(os.path.getsize('C:/data/1/' + file[:-2]))
 
-    print('filename', file[3:-7]) # filename
-    t1 = time.clock()
-    parser = PDBParser()
-    structure = parser.get_structure('PHA-L', 'C:/data/1/' + file[:-2])
-    fileSize = convert_size(os.path.getsize('C:/data/1/' + file[:-2]))
+            XMLParser.SubElement(structureHandler, "file_size", name="KB").text = str(fileSize)
 
-    XMLParser.SubElement(structureHandler, "file_size").text = str(fileSize)
+            print('pathsize in KB', convert_size(os.path.getsize('C:/data/1/' + file[:-2])))
+            listOfEntries[filename]['filesize'] = convert_size(os.path.getsize('C:/data/1/' + file[:-2]))
+            #print(insertEntryName(structure, cnx))
 
-    print('pathsize in KB', convert_size(os.path.getsize('C:/data/1/' + file[:-2])))
-    listOfEntries[filename]['filesize'] = convert_size(os.path.getsize('C:/data/1/' + file[:-2]))
-    #print(insertEntryName(structure, cnx))
+            print(int(round((time.time() - t1) * 1000)), 'ms') # time in ticks
+            parsingTime = int(round((time.time() - t1) * 1000))
+            listOfEntries[filename]['time'] = int(round((time.time() - t1) * 1000))
+            XMLParser.SubElement(structureHandler, "parsing_time", name="seconds").text = str(parsingTime)
 
-    print(int(round((time.clock() - t1) * 1000)), 'ms') # time in ticks
-    parsingTime = int(round((time.clock() - t1) * 1000))
-    listOfEntries[filename]['time'] = int(round((time.clock() - t1) * 1000))
-    XMLParser.SubElement(structureHandler, "parsing_time").text = str(parsingTime)
+            if len(WarningHackClass.listOfWarnings) != 0:
+                warningHandler = XMLParser.SubElement(structureHandler, "warnings")
+                listOfEntries[filename]['warnings'] = []
+                for item in WarningHackClass.listOfWarnings:
+                    XMLParser.SubElement(warningHandler, "warning", name=item[1]).text = item[0]
+                    listOfEntries[filename]['warnings'].append(item)
 
-    if len(WarningHackClass.listOfWarnings) != 0:
-        listOfEntries[filename]['warnings'] = []
-        for item in WarningHackClass.listOfWarnings:
-            listOfEntries[filename]['warnings'].append(item)
-
-    print ('warning: ', WarningHackClass.listOfWarnings)
-    if os.path.exists('C:/data/1/' + file[:-2]):
-        os.remove('C:/data/1/' + file[:-2])
-
+            print ('warning: ', WarningHackClass.listOfWarnings)
+            if os.path.exists('C:/data/1/' + file[:-2]):
+                os.remove('C:/data/1/' + file[:-2])
+        except:
+            print ("error while parsing")
+            XMLParser.SubElement(xmlErrors, "structure").text = file[3:-7]
+    except:
+        print("unknown error")
 
 def insertIntoDB(cnx):
     import mysql.connector
@@ -120,12 +126,13 @@ cnx = mysql.connector.connect(user='root', password='admin',
 listOfEntries = {}
 
 xmlTree = XMLParser.Element("data")
+xmlErrors = XMLParser.Element("errors")
 
 iterator = 0
 for file in files:
+    parseAndSaveToDatabase(mypath, file, _7zipLocation, cnx, listOfEntries, xmlTree, xmlErrors)
+    print(iterator)
     iterator += 1
-    parseAndSaveToDatabase(mypath, file, _7zipLocation, cnx, listOfEntries, xmlTree)
-    if iterator == 10:
-        break
 
 XMLParser.ElementTree(xmlTree).write("filename.xml")
+xmlErrors.ElementTree(xmlErrors).write("errors.xml")
