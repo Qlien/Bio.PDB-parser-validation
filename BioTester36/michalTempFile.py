@@ -91,31 +91,6 @@ def parseAndSaveToDatabase(filesDirectory, file, _7zipLocation, cnx, listOfEntri
     except:
         print("unknown error")
 
-def insertIntoDB(cnx):
-    import mysql.connector
-
-    cursor = cnx.cursor()
-
-    cursor.execute("INSERT INTO entries "
-               "(Name) "
-               "VALUES ('asdasd')")
-    cnx.commit()
-
-    cursor.close()
-    cnx.close()
-
-def insertEntryName(pdbParser, cnx):
-
-    cursor = cnx.cursor()
-    cursor.execute("INSERT INTO entries "
-               "(Name) "
-               "VALUES ('" + pdbParser.id + "')")
-    cnx.commit()
-
-    cursor.close()
-    cnx.close()
-    return cursor.lastrowid
-
 
 
 cnx = mysql.connector.connect(user='root', password='admin',
@@ -133,6 +108,8 @@ for file in files:
     parseAndSaveToDatabase(mypath, file, _7zipLocation, cnx, listOfEntries, xmlTree, xmlErrors)
     print(iterator)
     iterator += 1
+    if iterator == 10:
+        break
 
 XMLParser.ElementTree(xmlTree).write("filename.xml")
-xmlErrors.ElementTree(xmlErrors).write("errors.xml")
+XMLParser.ElementTree(xmlErrors).write("errors.xml")
