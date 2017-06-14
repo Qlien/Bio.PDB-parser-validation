@@ -59,7 +59,7 @@ def parseAndSaveToDatabase(filesDirectory, file, _7zipLocation, cnx, listOfEntri
 
         print('filename', file[3:-7]) # filename
         t1 = time.time()
-        parser = PDBParser()
+        parser = PDBParser(PERMISSIVE=0)
         try:
             structure = parser.get_structure('PHA-L', 'C:/data/1/' + file[:-2])
             fileSize = convert_size(os.path.getsize('C:/data/1/' + file[:-2]))
@@ -90,6 +90,8 @@ def parseAndSaveToDatabase(filesDirectory, file, _7zipLocation, cnx, listOfEntri
             XMLParser.SubElement(xmlErrors, "structure").text = file[3:-7]
     except:
         print("unknown error")
+        if os.path.exists('C:/data/1/' + file[:-2]):
+            os.remove('C:/data/1/' + file[:-2])
 
 
 
@@ -108,8 +110,6 @@ for file in files:
     parseAndSaveToDatabase(mypath, file, _7zipLocation, cnx, listOfEntries, xmlTree, xmlErrors)
     print(iterator)
     iterator += 1
-    if iterator == 10:
-        break
 
-XMLParser.ElementTree(xmlTree).write("filename.xml")
-XMLParser.ElementTree(xmlErrors).write("errors.xml")
+XMLParser.ElementTree(xmlTree).write("parserPermissiveFalsepython27.xml")
+XMLParser.ElementTree(xmlErrors).write("errorsparserPermissiveFalsepython27.xml")
