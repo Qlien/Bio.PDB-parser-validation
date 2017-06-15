@@ -103,4 +103,4 @@ pathToStore = "C:/data/1/"
 os.chdir(mypath)
 files = glob.glob('*.gz')
 
-parseAndSaveToDatabase(mypath, files, pathToStore, PERMISSIVE=1, filesZipped=True, _7zipLocation=_7zipLocation, deleteFileAfterError=False)
+parseAndSaveToDatabase(mypath, files, pathToStore, PERMISSIVE=0, filesZipped=True, _7zipLocation=_7zipLocation, deleteFileAfterError=False)
