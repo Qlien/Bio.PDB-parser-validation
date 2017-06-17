@@ -99,8 +99,8 @@ def parseAndSaveToDatabase(filesDirectory, files, saveDirectory, PERMISSIVE=1, f
 
 mypath = "C:/Users/Michal/AppData/Local/VirtualStore/Program Files (x86)/GnuWin32/bin/"
 _7zipLocation = "C:/Program Files/7-Zip/"
-pathToStore = "C:/data/1/"
+pathToStore = "C:/data/new/"
 os.chdir(mypath)
-files = glob.glob('*.gz')
+files = glob.glob('pdb2k*.ent.gz')
 
 parseAndSaveToDatabase(mypath, files, pathToStore, PERMISSIVE=0, filesZipped=True, _7zipLocation=_7zipLocation, deleteFileAfterError=False)
