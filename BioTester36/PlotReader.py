@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import csv
 
 
-tree = ET.parse('C:/Users/Michal/AppData/Local/VirtualStore/Program Files (x86)/GnuWin32/bin/parserData10-06-2017-14-00.xml')
+tree = ET.parse('C:/data/parserPermissiveFalsepython27.xml')
 root = tree.getroot()
 
 filesWithWarnings = []
@@ -28,7 +28,7 @@ for structure in root:
     iterator += 1
     print(iterator)
 
-with open("namesToSizeToErrorsCount.csv", "wb") as f:
+with open("C:/data/parserPermissiveFalsepython27.csv", "wb") as f:
     writer = csv.writer(f)
     writer.writerows(namesToSizesToWarningsList)
 print()
