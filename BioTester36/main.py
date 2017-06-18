@@ -1,16 +1,11 @@
+import glob
 import os
-import time
+from Parser import testParsingTimeAndSaveToXml
 
-from Bio.PDB import PDBParser
+mypath = "C:/Users/Michal/AppData/Local/VirtualStore/Program Files (x86)/GnuWin32/bin/"
+_7zipLocation = "C:/Program Files/7-Zip/"
+pathToStore = "C:/data/1/"
+os.chdir(mypath)
+files = glob.glob('pdb*.gz')
 
-parser = PDBParser()
-t1 = time.clock()
-structure = parser.get_structure('PHA-L', 'C:/data/pdb9xim.ent')
-
-
-
-print(time.clock() - t1)
-print(parser.header["author"])
-
-if os.path.exists('C:/data/1/pdb4no0.ent'):
-    os.remove('C:/data/1/pdb4no0.ent')
+testParsingTimeAndSaveToXml(files, pathToStore, "results36", mypath,  PERMISSIVE=1, filesZipped=True, _7zipLocation=_7zipLocation, deleteFileAfterError=False)
