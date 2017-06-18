@@ -27,3 +27,7 @@ PERMISSIVE=1 - by default 1 which is default as well in PDBParser. This paramete
 filesZipped=True - by default True. Function can parse compressed or non compressed files.
 
 _7zipLocation="" - IMPORTANT. Function uses 7zip to decompress compressed files (program was choosen because of the license). If left blank function takes PATH location to the program, but it is highly suggested to provide path to where 7z.exe file is located on hard drive.
+
+## Testing
+
+function is tested using sample compressed and uncompressed data attached to project, then parsing and saving it to xml, and comparing to expected output results.
