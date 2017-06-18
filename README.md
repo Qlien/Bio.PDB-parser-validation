@@ -6,6 +6,8 @@ Taking into account large size of structures combined and capricious nature of c
 
 From given xml file second file was made with information about names of structures in relation to number of warnings, size of structure, parsing time and types of warnings occured.
 
+## Main parsing function
+
 Main parsing function takes both mandatory and optional arguments:
 
 ```
