@@ -5,8 +5,6 @@ import os
 import subprocess
 import warnings
 import xml.etree.cElementTree as XMLParser
-from shutil import copy2
-
 
 def testParsingTimeAndSaveToXml(files, saveDirectory, outputName, filesDirectory="", PERMISSIVE=1, filesZipped=False, _7zipLocation="", deleteFileAfterError=False):
 
