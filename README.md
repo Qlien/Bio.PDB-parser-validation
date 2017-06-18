@@ -4,7 +4,7 @@ Purpouse of this project is to process every structure present in PDB using PDBP
 
 Taking into account large size of structures combined and capricious nature of connection to online database main assumption was to download compressed data, unpack it, process, save interesting data, and delete file. Collective information was then saved to xml file for further computations.
 
-From given xml file second file was made with information about names of structures in relation to number of warnings, size of structure, parsing time and types of warnings occured.
+From given xml file second file was made with information about names of structures in relation to number of warnings, size of structure and parsing time.
 
 ## Main parsing function
 
